@@ -19,7 +19,7 @@ router.post("/", async (req, res) => {
     const { name, email, subject, message } = req.body;
 
     const mailOptions = {
-      from: `"Lumea Contact Form" <${BREVO_USER}>`,
+      from: `"Lumea Contact Form" <sanusijohn0@gmail.com>`,
       to: ADMIN_RECEIVER,
       replyTo: email, // admin can reply directly to user
       subject: `New Contact Form Message: ${subject}`,
@@ -43,3 +43,4 @@ router.post("/", async (req, res) => {
 
 
 export default router;
+
