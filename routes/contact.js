@@ -7,7 +7,7 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 465,
-  secure: false,
+  secure: true,
   auth: {
     user: BREVO_USER,
     pass: BREVO_PASSWORD,
@@ -43,6 +43,7 @@ router.post("/", async (req, res) => {
 
 
 export default router;
+
 
 
 
