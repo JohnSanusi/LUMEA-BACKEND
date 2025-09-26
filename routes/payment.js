@@ -60,7 +60,7 @@ router.post("/", async (req, res) => {
     `
 
     const mailOptions = {
-      from: `"Lumea Orders" <${BREVO_USER}>`,
+      from: `"Lumea Orders" <sanusijohn0@gmail.com>`,
       to: ADMIN_RECEIVER,
       subject: "🛒 New Lumea Order",
       html: htmlBody,
@@ -76,3 +76,4 @@ router.post("/", async (req, res) => {
 
 
 export default router
+
