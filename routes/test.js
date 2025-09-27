@@ -1,8 +1,8 @@
 import express from "express";
-
+import {  BREVO_API_KEY } from "../config/env.js";
 const router = express.Router();
 
-router.get("/test-brevo", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const response = await fetch("https://api.brevo.com/v3/account", {
       headers: {
