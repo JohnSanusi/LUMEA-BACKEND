@@ -1,29 +1,26 @@
+import express from "express";
+import nodemailer from "nodemailer";
+import sendinblueTransport from "nodemailer-sendinblue-transport";
+import { ADMIN_RECEIVER, BREVO_API_KEY } from "../config/env.js";
 
-import express from "express"
-import nodemailer from "nodemailer"
-import { BREVO_USER, BREVO_PASSWORD, ADMIN_RECEIVER } from "../config/env.js"
+const router = express.Router();
 
-const router = express.Router()
-
-const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",
-  port: 465,
-  secure: false,
-  auth: {
-    user: BREVO_USER,
-    pass: BREVO_PASSWORD,
-  },
-})
+// Use Brevo API transport (no SMTP wahala)
+const transporter = nodemailer.createTransport(
+  sendinblueTransport({
+    apiKey: BREVO_API_KEY, // make sure this is set in Render env
+  })
+);
 
 router.post("/", async (req, res) => {
   try {
-    const { phone, items, totalItems } = req.body
+    const { phone, items, totalItems } = req.body;
 
     if (!phone || !items || items.length === 0) {
-      return res.status(400).json({ error: "Missing required order details" })
+      return res.status(400).json({ error: "Missing required order details" });
     }
 
-    // Format HTML table
+    // Format HTML table for the order
     const tableRows = items
       .map(
         (item, index) => `
@@ -37,7 +34,7 @@ router.post("/", async (req, res) => {
         </tr>
       `
       )
-      .join("")
+      .join("");
 
     const htmlBody = `
       <h2>🛒 New Order from Lumea</h2>
@@ -57,25 +54,21 @@ router.post("/", async (req, res) => {
           ${tableRows}
         </tbody>
       </table>
-    `
+    `;
 
     const mailOptions = {
-      from: `"Lumea Orders" <sanusijohn0@gmail.com>`,
+      from: "sanusijohn0@gmail.com", // must be verified in Brevo
       to: ADMIN_RECEIVER,
       subject: "🛒 New Lumea Order",
       html: htmlBody,
-    }
+    };
 
-    await transporter.sendMail(mailOptions)
-    res.status(200).json({ message: "Order sent successfully" })
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Order sent successfully" });
   } catch (error) {
-    console.error("Error sending order:", error)
-    res.status(500).json({ error: "Failed to send order" })
+    console.error("❌ Error sending order:", error);
+    res.status(500).json({ error: "Failed to send order" });
   }
-})
+});
 
-
-export default router
-
-
-
+export default router;
