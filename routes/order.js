@@ -55,7 +55,7 @@ router.post("/", async (req, res) => {
         "api-key": BREVO_API_KEY,
       },
       body: JSON.stringify({
-        sender: { email: "sanusijohn0@gmail.com", name: "John Sanusi" }, // must be verified in Brevo
+        sender: { email: "sanusijohn0@gmail.com", name: "Lumea Order Form Bot" }, // must be verified in Brevo
         to: [{ email: ADMIN_RECEIVER }],
         subject: "🛒 New Lumea Order",
         htmlContent: htmlBody,
