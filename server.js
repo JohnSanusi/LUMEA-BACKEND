@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import payment from "./routes/payment.js";
 import contact from "./routes/contact.js";
+import test from "./routes/test.js";
 import { PORT } from "./config/env.js";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(
 
 app.use(express.json());
 app.use("/api/payment", payment);
+app.use("/api/test-brevo", test);
 app.use("/api/contact", contact);
 
 app.listen(PORT, async () => {
