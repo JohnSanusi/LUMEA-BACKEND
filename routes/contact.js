@@ -14,7 +14,7 @@ router.post("/", async (req, res) => {
         "api-key": BREVO_API_KEY,
       },
       body: JSON.stringify({
-        sender: { email: "sanusijohn0@gmail.com", name: "John Sanusi" },
+        sender: { email: "sanusijohn0@gmail.com", name: "Lumea Contact Form Bot" },
         to: [{ email: ADMIN_RECEIVER }],
         replyTo: { email, name },
         subject: `New Contact Form Message: ${subject}`,
@@ -41,4 +41,5 @@ router.post("/", async (req, res) => {
 });
 
 export default router;
+
 
