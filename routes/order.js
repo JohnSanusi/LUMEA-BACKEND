@@ -1,16 +1,7 @@
 import express from "express";
-import nodemailer from "nodemailer";
-import sendinblueTransport from "nodemailer-sendinblue-transport";
 import { ADMIN_RECEIVER, BREVO_API_KEY } from "../config/env.js";
 
 const router = express.Router();
-
-// Use Brevo API transport (no SMTP wahala)
-const transporter = nodemailer.createTransport(
-  sendinblueTransport({
-    apiKey: BREVO_API_KEY, // make sure this is set in Render env
-  })
-);
 
 router.post("/", async (req, res) => {
   try {
@@ -20,19 +11,19 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Missing required order details" });
     }
 
-    // Format HTML table for the order
+    // Build order table rows
     const tableRows = items
       .map(
         (item, index) => `
-        <tr>
-          <td style="text-align:center; padding:8px; border:1px solid #ddd;">${index + 1}</td>
-          <td style="padding:8px; border:1px solid #ddd;">
-            <img src="${item.image}" alt="Product" width="60" height="60" style="object-fit:cover; border-radius:6px;" />
-          </td>
-          <td style="padding:8px; border:1px solid #ddd;">${item.category}</td>
-          <td style="padding:8px; border:1px solid #ddd;">${item.quantity}</td>
-        </tr>
-      `
+          <tr>
+            <td style="text-align:center; padding:8px; border:1px solid #ddd;">${index + 1}</td>
+            <td style="padding:8px; border:1px solid #ddd;">
+              <img src="${item.image}" alt="Product" width="60" height="60" style="object-fit:cover; border-radius:6px;" />
+            </td>
+            <td style="padding:8px; border:1px solid #ddd;">${item.category}</td>
+            <td style="padding:8px; border:1px solid #ddd;">${item.quantity}</td>
+          </tr>
+        `
       )
       .join("");
 
@@ -56,14 +47,26 @@ router.post("/", async (req, res) => {
       </table>
     `;
 
-    const mailOptions = {
-      from: "sanusijohn0@gmail.com", // must be verified in Brevo
-      to: ADMIN_RECEIVER,
-      subject: "🛒 New Lumea Order",
-      html: htmlBody,
-    };
+    // Call Brevo API directly
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": BREVO_API_KEY,
+      },
+      body: JSON.stringify({
+        sender: { email: "sanusijohn0@gmail.com", name: "John Sanusi" }, // must be verified in Brevo
+        to: [{ email: ADMIN_RECEIVER }],
+        subject: "🛒 New Lumea Order",
+        htmlContent: htmlBody,
+      }),
+    });
 
-    await transporter.sendMail(mailOptions);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Brevo API error: ${response.status} ${errorText}`);
+    }
+
     res.status(200).json({ message: "Order sent successfully" });
   } catch (error) {
     console.error("❌ Error sending order:", error);
