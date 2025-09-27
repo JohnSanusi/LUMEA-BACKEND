@@ -1,5 +1,4 @@
 import express from "express";
-import fetch from "node-fetch";
 import { ADMIN_RECEIVER, BREVO_API_KEY } from "../config/env.js";
 
 const router = express.Router();
@@ -42,3 +41,4 @@ router.post("/", async (req, res) => {
 });
 
 export default router;
+
